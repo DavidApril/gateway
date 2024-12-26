@@ -9,7 +9,7 @@ import { RpcCustomExceptionFilter } from './shared/exceptions';
 async function bootstrap() {
 	const logger = new Logger('Gateway');
 
-	const app = await NestFactory.create(AppModule);
+	const app = await NestFactory.create(AppModule, { cors: true });
 	app.setGlobalPrefix('api');
 
 	app.useGlobalPipes(
