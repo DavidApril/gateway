@@ -1,10 +1,10 @@
-import { Auth } from 'src/shared/decorators';
 import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
-import { catchError } from 'rxjs';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { LoginUserDto, RegisterUserDto } from './dto';
+import { catchError } from 'rxjs';
 import { NATS_SERVICE } from 'src/config';
 import { Token, User } from './decorators';
+import { LoginUserDto, RegisterUserDto } from './dto';
+import { Auth } from 'src/shared/decorators';
 
 @Controller('auth')
 export class AuthController {
@@ -32,5 +32,14 @@ export class AuthController {
 	@Auth()
 	verifyToken(@User() user: any, @Token() token: string) {
 		return { user, token };
+	}
+
+	@Get('seed')
+	seed() {
+		return this.client.send('seed.execute', {}).pipe(
+			catchError((e) => {
+				throw new RpcException(e);
+			})
+		);
 	}
 }
