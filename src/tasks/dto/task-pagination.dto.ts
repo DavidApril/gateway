@@ -20,4 +20,9 @@ export class TaskPaginationDto extends PaginationDto {
 	@IsOptional()
 	@IsString()
 	due_date: string;
+
+	@ApiPropertyOptional({ description: 'The UUID of the team' })
+	@IsOptional()
+	@IsUUID()
+	team_id: string;
 }
