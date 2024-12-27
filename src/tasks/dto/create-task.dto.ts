@@ -26,6 +26,11 @@ export class CreateTaskDto {
 	@IsEnum(TaskStateList, { message: `Valid status are: ${TaskStateList}` })
 	status = TaskState.TODO;
 
+	@IsUUID()
+	@IsOptional()
+	@ApiProperty({ description: 'the UUID of the team this task belongs to', default: null })
+	team_id: string = null;
+
 	@ApiProperty({ description: 'The UUID of the project this task belongs to' })
 	@IsUUID()
 	@IsNotEmpty()
