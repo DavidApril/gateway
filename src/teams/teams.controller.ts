@@ -3,7 +3,6 @@ import { catchError } from 'rxjs';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { AssociateToProjectDto, AssociateUserDto, CreateTeamDto, TeamPaginationDto, UpdateTeamDto } from './dto';
 import { NATS_SERVICE } from 'src/config';
-import { PaginationDto } from 'src/shared/dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('teams')
@@ -24,12 +23,12 @@ export class TeamsController {
 		);
 	}
 
-	@Get('id/:id')
-	@ApiOperation({ summary: 'Find one team by ID' })
+	@Get()
+	@ApiOperation({ summary: 'Find teams' })
 	@ApiResponse({ status: 200, description: 'Team found.' })
 	@ApiResponse({ status: 404, description: 'Team not found.' })
-	findOne(@Param('id') id: string) {
-		return this.client.send('teams.find.one', id).pipe(
+	findOne(@Query() teamsPaginationDto: TeamPaginationDto) {
+		return this.client.send('teams.find', teamsPaginationDto).pipe(
 			catchError((e) => {
 				console.error(e);
 				throw new RpcException(e);
