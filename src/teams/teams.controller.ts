@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Inject, Param, Patch, Post, Query } from '@nestjs/common';
 import { catchError } from 'rxjs';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { CreateTeamDto, UpdateTeamDto } from './dto';
+import { AssociateToProjectDto, AssociateUserDto, CreateTeamDto, TeamPaginationDto, UpdateTeamDto } from './dto';
 import { NATS_SERVICE } from 'src/config';
 import { PaginationDto } from 'src/shared/dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -24,32 +24,6 @@ export class TeamsController {
 		);
 	}
 
-	@Get()
-	@ApiOperation({ summary: 'Get all teams' })
-	@ApiResponse({ status: 200, description: 'All teams returned.' })
-	findAll() {
-		return this.client.send('teams.find.all', {}).pipe(
-			catchError((e) => {
-				console.error(e);
-				throw new RpcException(e);
-			})
-		);
-	}
-
-	@Get(':project_id')
-	@ApiOperation({ summary: 'Get all teams by project status' })
-	@ApiResponse({ status: 200, description: 'All teams for the project returned.' })
-	async findAllByStatus(@Param() project_id: string, @Query() paginationDto: PaginationDto) {
-		try {
-			return this.client.send('teams.find.all', {
-				...paginationDto,
-				project_id,
-			});
-		} catch (e) {
-			throw new RpcException(e);
-		}
-	}
-
 	@Get('id/:id')
 	@ApiOperation({ summary: 'Find one team by ID' })
 	@ApiResponse({ status: 200, description: 'Team found.' })
@@ -69,6 +43,29 @@ export class TeamsController {
 	@ApiResponse({ status: 404, description: 'Team not found.' })
 	update(@Body() updateTeamDto: UpdateTeamDto) {
 		return this.client.send('teams.update', updateTeamDto).pipe(
+			catchError((e) => {
+				console.error(e);
+				throw new RpcException(e);
+			})
+		);
+	}
+
+	@Post('/associate_project')
+	@ApiOperation({ summary: 'Associate a team to a project' })
+	@ApiResponse({ status: 201, description: 'Association successful.' })
+	@ApiResponse({ status: 400, description: 'Bad request.' })
+	associateToProject(@Body() associateToProjectDto: AssociateToProjectDto) {
+		return this.client.send('teams.associate.project', associateToProjectDto).pipe(
+			catchError((e) => {
+				console.error(e);
+				throw new RpcException(e);
+			})
+		);
+	}
+
+	@Post('/associate_user')
+	associateUser(@Body() associateUser: AssociateUserDto) {
+		return this.client.send('teams.associate.user', associateUser).pipe(
 			catchError((e) => {
 				console.error(e);
 				throw new RpcException(e);
